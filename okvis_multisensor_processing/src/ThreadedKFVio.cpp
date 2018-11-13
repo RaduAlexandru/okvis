@@ -181,6 +181,8 @@ ThreadedKFVio::~ThreadedKFVio() {
   optimizationThread_.join();
   publisherThread_.join();
 
+  m_pose_file.close();
+
   /*okvis::kinematics::Transformation endPosition;
   estimator_.get_T_WS(estimator_.currentFrameId(), endPosition);
   std::stringstream s;
@@ -848,6 +850,33 @@ void ThreadedKFVio::optimizationLoop() {
     }
     optimizationResults_.Push(result);
 
+
+
+    std::cout << "Saving the last pose into file ";
+    float timestamp=result.stamp.toSec();
+    float x=result.T_WS.r().x();
+    float y=result.T_WS.r().y();
+    float z=result.T_WS.r().z();
+    float qx=result.T_WS.q().x();
+    float qy=result.T_WS.q().y();
+    float qz=result.T_WS.q().z();
+    float qw=result.T_WS.q().w();
+     //cv::Mat Tcw= m_per_frame_pose[i];
+       // cv::Mat Rwc = Tcw.rowRange(0,3).colRange(0,3).t();
+        //cv::Mat twc = Tcw.rowRange(0,3).col(3);
+
+//        vector<float> q = Converter::toQuaternion(Rwc);
+
+    //TODO For some reason some poses have a timestamp of 0 and everything else is also 0.....
+    //if(qx<0.000001){
+    //  return;
+    //}
+
+    m_pose_file << std::setprecision(6) << timestamp << " " << std::setprecision(9) << x << " " << y << " " << z << " " << qx << " " << qy << " " << qz << " " << qw << std::endl;
+
+
+
+
     // adding further elements to visualization data that do not access estimator
     if (parameters_.visualization.displayImages) {
       visualizationDataPtr->currentFrames = frame_pairs;
@@ -865,28 +894,28 @@ void ThreadedKFVio::publisherLoop() {
     if (optimizationResults_.PopBlocking(&result) == false)
       return;
 
-    std::cout << "Saving the last pose into file ";
+   // std::cout << "Saving the last pose into file ";
 
-    float timestamp=result.stamp.toSec();
-    float x=result.T_WS.r().x();
-    float y=result.T_WS.r().y();
-    float z=result.T_WS.r().z();
-    float qx=result.T_WS.q().x();
-    float qy=result.T_WS.q().y();
-    float qz=result.T_WS.q().z();
-    float qw=result.T_WS.q().w();
-     //cv::Mat Tcw= m_per_frame_pose[i];
-       // cv::Mat Rwc = Tcw.rowRange(0,3).colRange(0,3).t();
-        //cv::Mat twc = Tcw.rowRange(0,3).col(3);
+//     float timestamp=result.stamp.toSec();
+//     float x=result.T_WS.r().x();
+//     float y=result.T_WS.r().y();
+//     float z=result.T_WS.r().z();
+//     float qx=result.T_WS.q().x();
+//     float qy=result.T_WS.q().y();
+//     float qz=result.T_WS.q().z();
+//     float qw=result.T_WS.q().w();
+//      //cv::Mat Tcw= m_per_frame_pose[i];
+//        // cv::Mat Rwc = Tcw.rowRange(0,3).colRange(0,3).t();
+//         //cv::Mat twc = Tcw.rowRange(0,3).col(3);
 
-//        vector<float> q = Converter::toQuaternion(Rwc);
+// //        vector<float> q = Converter::toQuaternion(Rwc);
 
-    //TODO For some reason some poses have a timestamp of 0 and everything else is also 0.....
-    if(timestamp==0.0){
-      return;
-    }
+//     //TODO For some reason some poses have a timestamp of 0 and everything else is also 0.....
+//     //if(qx<0.000001){
+//     //  return;
+//     //}
 
-    m_pose_file << std::setprecision(6) << timestamp << " " << std::setprecision(9) << x << " " << y << " " << z << " " << qx << " " << qy << " " << qz << " " << qw << std::endl;
+//     m_pose_file << std::setprecision(6) << timestamp << " " << std::setprecision(9) << x << " " << y << " " << z << " " << qx << " " << qy << " " << qz << " " << qw << std::endl;
 
 
     // call all user callbacks
