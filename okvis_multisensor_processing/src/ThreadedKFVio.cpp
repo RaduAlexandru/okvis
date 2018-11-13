@@ -90,6 +90,10 @@ ThreadedKFVio::ThreadedKFVio(okvis::VioParameters& parameters)
 
 // Initialises settings and calls startThreads().
 void ThreadedKFVio::init() {
+
+  m_pose_file.open ("raw_pose_file_okvis.txt");
+  m_pose_file << std::fixed;
+
   assert(parameters_.nCameraSystem.numCameras() > 0);
   numCameras_ = parameters_.nCameraSystem.numCameras();
   numCameraPairs_ = 1;
@@ -860,6 +864,30 @@ void ThreadedKFVio::publisherLoop() {
     OptimizationResults result;
     if (optimizationResults_.PopBlocking(&result) == false)
       return;
+
+    std::cout << "Saving the last pose into file ";
+
+    float timestamp=result.stamp.toSec();
+    float x=result.T_WS.r().x();
+    float y=result.T_WS.r().y();
+    float z=result.T_WS.r().z();
+    float qx=result.T_WS.q().x();
+    float qy=result.T_WS.q().y();
+    float qz=result.T_WS.q().z();
+    float qw=result.T_WS.q().w();
+     //cv::Mat Tcw= m_per_frame_pose[i];
+       // cv::Mat Rwc = Tcw.rowRange(0,3).colRange(0,3).t();
+        //cv::Mat twc = Tcw.rowRange(0,3).col(3);
+
+//        vector<float> q = Converter::toQuaternion(Rwc);
+
+    //TODO For some reason some poses have a timestamp of 0 and everything else is also 0.....
+    if(timestamp==0.0){
+      return;
+    }
+
+    m_pose_file << std::setprecision(6) << timestamp << " " << std::setprecision(9) << x << " " << y << " " << z << " " << qx << " " << qy << " " << qz << " " << qw << std::endl;
+
 
     // call all user callbacks
     if (stateCallback_ && !result.onlyPublishLandmarks)

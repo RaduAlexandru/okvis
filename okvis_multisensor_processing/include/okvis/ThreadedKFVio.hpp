@@ -45,6 +45,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
+#include <fstream>
 
 #include <okvis/cameras/NCameraSystem.hpp>
 #include <okvis/Measurements.hpp>
@@ -87,6 +88,8 @@ namespace okvis {
  */
 class ThreadedKFVio : public VioInterface {
  public:
+
+  std::ofstream m_pose_file;
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   OKVIS_DEFINE_EXCEPTION(Exception, std::runtime_error)
@@ -286,7 +289,7 @@ class ThreadedKFVio : public VioInterface {
    */
   int deleteImuMeasurements(const okvis::Time& eraseUntil);
 
- private:
+ public:
 
   /// @brief This struct contains the results of the optimization for ease of publication.
   ///        It is also used for publishing poses that have been propagated with the IMU
