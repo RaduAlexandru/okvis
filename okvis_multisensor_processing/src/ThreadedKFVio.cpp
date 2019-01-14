@@ -853,7 +853,7 @@ void ThreadedKFVio::optimizationLoop() {
 
 
     std::cout << "Saving the last pose into file ";
-    float timestamp=result.stamp.toSec();
+    double timestamp=(double)result.stamp.toNSec()/1000000000.0;
     float x=result.T_WS.r().x();
     float y=result.T_WS.r().y();
     float z=result.T_WS.r().z();
@@ -861,6 +861,8 @@ void ThreadedKFVio::optimizationLoop() {
     float qy=result.T_WS.q().y();
     float qz=result.T_WS.q().z();
     float qw=result.T_WS.q().w();
+
+    //std::cout << "timestamp is " << timestamp << "\n";
      //cv::Mat Tcw= m_per_frame_pose[i];
        // cv::Mat Rwc = Tcw.rowRange(0,3).colRange(0,3).t();
         //cv::Mat twc = Tcw.rowRange(0,3).col(3);
