@@ -8,7 +8,7 @@ set(OKVIS_PATCH_VERSION 3)
 set(OKVIS_VERSION
   ${OKVIS_MAJOR_VERSION}.${OKVIS_MINOR_VERSION}.${OKVIS_PATCH_VERSION})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=maybe-uninitialized")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=maybe-uninitialized -std=c++0x")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=maybe-uninitialized")
 
 # options for build configuration
@@ -116,10 +116,10 @@ else()
   ExternalProject_Add(brisk_external
     URL "https://www.doc.ic.ac.uk/~sleutene/software/brisk-2.0.3.zip"    
     INSTALL_DIR ${CMAKE_BINARY_DIR}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} -DCMAKE_C_FLAGS="-std=c++11" -DCMAKE_CXX_FLAGS="-std=c++11"
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/brisk
     BUILD_IN_SOURCE 0
-    BUILD_COMMAND make -j${N_CORES}
+    BUILD_COMMAND make -j${N_CORES} 
     INSTALL_COMMAND make install
   )
   add_library(brisk STATIC IMPORTED)
